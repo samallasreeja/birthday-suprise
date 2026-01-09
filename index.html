@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Birthday Surprise 🎂</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to bottom, #ffd6e8, #fbb1bd);
+    overflow-x: hidden;
+}
+
+/* Start section */
+.start {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px;
+}
+
+h1 {
+    font-size: 42px;
+    color: #b30059;
+}
+
+p {
+    font-size: 18px;
+    color: #444;
+    max-width: 700px;
+}
+
+button {
+    padding: 14px 32px;
+    border: none;
+    border-radius: 30px;
+    background: #ff4d88;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 25px;
+}
+
+button:hover {
+    background: #e6005c;
+}
+
+/* Gallery */
+.gallery {
+    display: none;
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding-bottom: 60px;
+}
+
+.photos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin-top: 40px;
+    max-width: 1000px;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.photo-box {
+    position: relative;
+}
+
+.photo-box img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.delete-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Upload button */
+.upload-btn {
+    background: #ff4d88;
+    color: white;
+    padding: 12px 28px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+.upload-btn:hover {
+    background: #e6005c;
+}
+
+/* Message */
+.message {
+    display: none;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.message-box {
+    background: linear-gradient(135deg, #7a6ff0, #ff6fa5);
+    color: white;
+    padding: 45px;
+    border-radius: 25px;
+    max-width: 750px;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .photos { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 500px) {
+    .photos { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Music -->
+<audio id="song" loop>
+    <source src="birthday_song.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Start -->
+<div class="start">
+    <h1>🎉 Happy Birthday Beautiful 🎂</h1>
+    <p>Today is all about celebrating YOU 💖</p>
+    <button onclick="startSurprise()">Start the Surprise 💝</button>
+</div>
+
+<!-- Gallery -->
+<div class="gallery" id="gallery">
+    <h1>Our Memories 📸</h1>
+
+    <label class="upload-btn">
+        ➕ Add Photos
+        <input type="file" accept="image/*" multiple hidden onchange="addPhotos(event)">
+    </label>
+
+    <div class="photos" id="photos"></div>
+</div>
+
+<!-- Message -->
+<div class="message" id="message">
+    <div class="message-box">
+        <h2>A Special Message for You 💌</h2>
+        <p>Happy Birthday to the one who makes everything beautiful ❤️</p>
+    </div>
+</div>
+
+<script>
+let storedPhotos = JSON.parse(localStorage.getItem("photos")) || [];
+
+function startSurprise() {
+    document.getElementById("song").play();
+
+    const gallery = document.getElementById("gallery");
+    gallery.style.display = "flex";
+    gallery.scrollIntoView({ behavior: "smooth" });
+
+    setTimeout(() => {
+        document.getElementById("message").style.display = "flex";
+        document.getElementById("message").scrollIntoView({ behavior: "smooth" });
+    }, 6000);
+}
+
+function savePhotos() {
+    localStorage.setItem("photos", JSON.stringify(storedPhotos));
+}
+
+function renderPhotos() {
+    const container = document.getElementById("photos");
+    container.innerHTML = "";
+
+    storedPhotos.forEach((src, index) => {
+        const box = document.createElement("div");
+        box.className = "photo-box";
+
+        const img = document.createElement("img");
+        img.src = src;
+
+        const del = document.createElement("button");
+        del.className = "delete-btn";
+        del.innerText = "×";
+        del.onclick = () => deletePhoto(index);
+
+        box.appendChild(img);
+        box.appendChild(del);
+        container.appendChild(box);
+    });
+}
+
+function addPhotos(event) {
+    const files = event.target.files;
+
+    for (let file of files) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            storedPhotos.push(e.target.result);
+            savePhotos();
+            renderPhotos();
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function deletePhoto(index) {
+    storedPhotos.splice(index, 1);
+    savePhotos();
+    renderPhotos();
+}
+
+/* Load saved photos on page load */
+renderPhotos();
+</script>
+
+</body>
+</html>
